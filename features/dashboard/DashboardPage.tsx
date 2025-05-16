@@ -40,10 +40,7 @@ export default function DashboardPage() {
                     const userData = await response.json();
                     setUser(userData);
                 } else {
-                    // Handle authentication error
                     console.error('Authentication failed');
-                    // You could redirect to login page here
-                    // window.location.href = '/login';
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
@@ -55,16 +52,40 @@ export default function DashboardPage() {
         fetchUserInfo();
     }, []);
 
+    const fetchMemos = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setMemos(data);
+            } else {
+                console.error('Failed to fetch memos:', await response.text());
+            }
+        } catch (error) {
+            console.error('Error fetching memos:', error);
+        }
+    }
+
     const handleCreate = async () => {
         if (!newTitle || !newContent) return;
 
+        const csrfToken = getCookie('csrftoken'); // Get token from cookie
+
         try {
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include', // Important for sending cookies/authentication
+                headers,
+                credentials: 'include',
                 body: JSON.stringify({
                     title: newTitle,
                     content: newContent,
@@ -85,6 +106,22 @@ export default function DashboardPage() {
         }
     };
 
+    function getCookie(name: string | any[]) {
+        let cookieValue = null;
+        if (typeof document !== 'undefined' && document.cookie) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
     const handleEdit = (id: number) => {
         const memo = memos.find((m) => m.id === id);
         if (memo) {
@@ -104,7 +141,7 @@ export default function DashboardPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // Important for sending cookies/authentication
+                credentials: 'include',
                 body: JSON.stringify({
                     title: newTitle,
                     content: newContent,
@@ -214,30 +251,29 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Memo list */}
-                {memos.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {memos.map((memo) => (
-                            <Card key={memo.id}>
-                                <CardHeader>
-                                    <CardTitle>{memo.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-2">
-                                    <p className="text-sm text-muted-foreground">{memo.content}</p>
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" onClick={() => handleEdit(memo.id)}>
-                                            Edit
-                                        </Button>
-                                        <Button variant="destructive" onClick={() => handleDelete(memo.id)}>
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                {memos && memos.length > 0 ? (
+                    memos.map((memo) => (
+                        <Card key={memo.id} className="mb-4">
+                            <CardHeader>
+                                <CardTitle>{memo.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <p className="text-sm text-muted-foreground whitespace-pre-line">{memo.content}</p>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" onClick={() => handleEdit(memo.id)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" onClick={() => handleDelete(memo.id)}>
+                                        Delete
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
                 ) : (
-                    <p className="text-gray-500">No memos yet.</p>
+                    <p className="text-center text-muted-foreground">No memos found.</p>
                 )}
+
             </div>
 
             {/* Drawer Content */}
@@ -281,3 +317,5 @@ export default function DashboardPage() {
         </div>
     );
 }
+
+
