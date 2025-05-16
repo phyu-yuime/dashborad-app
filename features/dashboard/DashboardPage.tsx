@@ -215,7 +215,7 @@ export default function DashboardPage() {
                     <DrawerTrigger asChild>
                         <Button variant="default" className="w-full flex items-center gap-2">
                             <Plus size={18} />
-                            Create Memo
+                            メーモを作成
                         </Button>
                     </DrawerTrigger>
                 </Drawer>
@@ -244,7 +244,7 @@ export default function DashboardPage() {
                             <DrawerTrigger asChild>
                                 <Button variant="default" className="flex items-center gap-2">
                                     <Plus size={18} />
-                                    Create Memo
+                                    メーモを作成
                                 </Button>
                             </DrawerTrigger>
                         </Drawer>
@@ -281,34 +281,36 @@ export default function DashboardPage() {
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                 <DrawerContent>
                     <DrawerHeader>
-                        <DrawerTitle>{editingId ? 'Edit Memo' : 'Create Memo'}</DrawerTitle>
+                        <DrawerTitle>{editingId ? '改修メーモ' : 'メーモ'}</DrawerTitle>
                     </DrawerHeader>
                     <div className="p-4 space-y-4">
                         <div>
-                            <Label htmlFor="title">Title</Label>
+                            <Label htmlFor="title" className='mb-[0.75rem]'>タイトル</Label>
                             <Input
+                                className='bg-gray-200 border-black-500'
                                 id="title"
                                 value={newTitle}
                                 onChange={(e) => setNewTitle(e.target.value)}
-                                placeholder="Memo title"
+                                placeholder="メーモのタイトル"
                             />
                         </div>
                         <div>
-                            <Label htmlFor="content">Content</Label>
-                            <Textarea
+                            <Label htmlFor="content" className='mb-[0.75rem]'>内容</Label>
+                            <Textarea className='bg-gray-200 border-black-500'
                                 id="content"
                                 value={newContent}
                                 onChange={(e) => setNewContent(e.target.value)}
-                                placeholder="Memo content"
+                                placeholder="メーモの内容"
+                                rows={4}
                             />
                         </div>
                         <div className="flex gap-2">
                             <Button onClick={editingId ? handleUpdate : handleCreate} className="flex-1">
-                                {editingId ? 'Update' : 'Create'}
+                                {editingId ? '更新' : '作成'}
                             </Button>
                             <DrawerClose asChild>
                                 <Button variant="outline" className="flex-1" onClick={resetForm}>
-                                    Cancel
+                                    キャンセル
                                 </Button>
                             </DrawerClose>
                         </div>
