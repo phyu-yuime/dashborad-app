@@ -3,5 +3,9 @@ export interface FormData{
     password: string;
 }
     
-
+export interface Memo {
+    id: number;
+    title: string;
+    content: string;
+}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,13 +14,9 @@ import {
 } from '@/components/ui/drawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, User } from 'lucide-react';
+import { Memo } from '@/types/types';
 
-interface Memo {
-    id: number;
-    title: string;
-    content: string;
-}
 
 export default function DashboardPage() {
     const [memos, setMemos] = useState<Memo[]>([]);
@@ -28,6 +24,36 @@ export default function DashboardPage() {
     const [newContent, setNewContent] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [user, setUser] = useState<{ username: string } | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch user info when component mounts
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUser(userData);
+                } else {
+                    // Handle authentication error
+                    console.error('Authentication failed');
+                    // You could redirect to login page here
+                    // window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
 
     const handleCreate = () => {
         if (!newTitle || !newContent) return;
@@ -78,6 +104,21 @@ export default function DashboardPage() {
             {/* Sidebar */}
             <div className="w-64 border-r p-4 hidden md:block">
                 <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
+
+                {/* User info section */}
+                <div className="mb-6 py-2 border-b">
+                    <div className="flex items-center gap-2 mb-2 ">
+                        <User size={30} />
+                        {loading ? (
+                            <p className="text-sm text-muted-foreground">Loading...</p>
+                        ) : user ? (
+                            <p className="font-medium">Welcome, {user.username}</p>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">Not logged in</p>
+                        )}
+                    </div>
+                </div>
+
                 <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                     <DrawerTrigger asChild>
                         <Button variant="default" className="w-full flex items-center gap-2">
@@ -90,16 +131,32 @@ export default function DashboardPage() {
 
             {/* Main content */}
             <div className="flex-1 p-6">
-                <div className="mb-4 md:hidden">
+                <div className="mb-4">
+                    {/* User info for mobile view */}
+                    <div className="md:hidden flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <User size={18} />
+                            {loading ? (
+                                <span className="text-sm text-muted-foreground">Loading...</span>
+                            ) : user ? (
+                                <span className="font-medium">Welcome, {user.username}</span>
+                            ) : (
+                                <span className="text-sm text-muted-foreground">Not logged in</span>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Show drawer trigger on mobile */}
-                    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                        <DrawerTrigger asChild>
-                            <Button variant="default" className="flex items-center gap-2">
-                                <Plus size={18} />
-                                Create Memo
-                            </Button>
-                        </DrawerTrigger>
-                    </Drawer>
+                    <div className="md:hidden">
+                        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                            <DrawerTrigger asChild>
+                                <Button variant="default" className="flex items-center gap-2">
+                                    <Plus size={18} />
+                                    Create Memo
+                                </Button>
+                            </DrawerTrigger>
+                        </Drawer>
+                    </div>
                 </div>
 
                 {/* Memo list */}

@@ -22,7 +22,8 @@ const LoginPage = () => {
     useEffect(() => {
         const fetchCsrfToken = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/auth/', {
+
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/`, {
                     method: 'GET',
                     credentials: 'include',
                 });
