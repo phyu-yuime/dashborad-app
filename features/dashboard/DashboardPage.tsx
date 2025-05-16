@@ -55,18 +55,34 @@ export default function DashboardPage() {
         fetchUserInfo();
     }, []);
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         if (!newTitle || !newContent) return;
 
-        setMemos([
-            ...memos,
-            {
-                id: Date.now(),
-                title: newTitle,
-                content: newContent,
-            },
-        ]);
-        resetForm();
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Important for sending cookies/authentication
+                body: JSON.stringify({
+                    title: newTitle,
+                    content: newContent,
+                }),
+            });
+
+            if (response.ok) {
+                const newMemo = await response.json();
+                setMemos([...memos, newMemo]);
+                resetForm();
+            } else {
+                console.error('Failed to create memo:', await response.text());
+                alert('Failed to create memo. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error creating memo:', error);
+            alert('An error occurred while creating the memo.');
+        }
     };
 
     const handleEdit = (id: number) => {
@@ -79,17 +95,55 @@ export default function DashboardPage() {
         }
     };
 
-    const handleUpdate = () => {
-        setMemos((prev) =>
-            prev.map((memo) =>
-                memo.id === editingId ? { ...memo, title: newTitle, content: newContent } : memo
-            )
-        );
-        resetForm();
+    const handleUpdate = async () => {
+        if (!editingId) return;
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/${editingId}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Important for sending cookies/authentication
+                body: JSON.stringify({
+                    title: newTitle,
+                    content: newContent,
+                }),
+            });
+
+            if (response.ok) {
+                const updatedMemo = await response.json();
+                setMemos((prev) =>
+                    prev.map((memo) => (memo.id === editingId ? updatedMemo : memo))
+                );
+                resetForm();
+            } else {
+                console.error('Failed to update memo:', await response.text());
+                alert('Failed to update memo. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error updating memo:', error);
+            alert('An error occurred while updating the memo.');
+        }
     };
 
-    const handleDelete = (id: number) => {
-        setMemos(memos.filter((memo) => memo.id !== id));
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/${id}/`, {
+                method: 'DELETE',
+                credentials: 'include', // Important for sending cookies/authentication
+            });
+
+            if (response.ok) {
+                setMemos(memos.filter((memo) => memo.id !== id));
+            } else {
+                console.error('Failed to delete memo:', await response.text());
+                alert('Failed to delete memo. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting memo:', error);
+            alert('An error occurred while deleting the memo.');
+        }
     };
 
     const resetForm = () => {
@@ -107,14 +161,14 @@ export default function DashboardPage() {
 
                 {/* User info section */}
                 <div className="mb-6 py-2 border-b">
-                    <div className="flex items-center gap-2 mb-2 ">
-                        <User size={30} />
+                    <div className="flex items-center gap-2 mb-2">
+                        <User size={18} />
                         {loading ? (
-                            <p className="text-sm text-muted-foreground">Loading...</p>
+                            <span className="text-sm text-muted-foreground">Loading...</span>
                         ) : user ? (
-                            <p className="font-medium">Welcome, {user.username}</p>
+                            <span className="font-medium">Welcome, {user.username}</span>
                         ) : (
-                            <p className="text-sm text-muted-foreground">Not logged in</p>
+                            <span className="text-sm text-muted-foreground">Not logged in</span>
                         )}
                     </div>
                 </div>
