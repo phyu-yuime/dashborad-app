@@ -1,0 +1,172 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Plus, X } from 'lucide-react';
+
+interface Memo {
+    id: number;
+    title: string;
+    content: string;
+}
+
+export default function DashboardPage() {
+    const [memos, setMemos] = useState<Memo[]>([]);
+    const [newTitle, setNewTitle] = useState('');
+    const [newContent, setNewContent] = useState('');
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+    const handleCreate = () => {
+        if (!newTitle || !newContent) return;
+
+        setMemos([
+            ...memos,
+            {
+                id: Date.now(),
+                title: newTitle,
+                content: newContent,
+            },
+        ]);
+        resetForm();
+    };
+
+    const handleEdit = (id: number) => {
+        const memo = memos.find((m) => m.id === id);
+        if (memo) {
+            setNewTitle(memo.title);
+            setNewContent(memo.content);
+            setEditingId(id);
+            setIsDrawerOpen(true);
+        }
+    };
+
+    const handleUpdate = () => {
+        setMemos((prev) =>
+            prev.map((memo) =>
+                memo.id === editingId ? { ...memo, title: newTitle, content: newContent } : memo
+            )
+        );
+        resetForm();
+    };
+
+    const handleDelete = (id: number) => {
+        setMemos(memos.filter((memo) => memo.id !== id));
+    };
+
+    const resetForm = () => {
+        setNewTitle('');
+        setNewContent('');
+        setEditingId(null);
+        setIsDrawerOpen(false);
+    };
+
+    return (
+        <div className="flex min-h-screen">
+            {/* Sidebar */}
+            <div className="w-64 border-r p-4 hidden md:block">
+                <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
+                <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                    <DrawerTrigger asChild>
+                        <Button variant="default" className="w-full flex items-center gap-2">
+                            <Plus size={18} />
+                            Create Memo
+                        </Button>
+                    </DrawerTrigger>
+                </Drawer>
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 p-6">
+                <div className="mb-4 md:hidden">
+                    {/* Show drawer trigger on mobile */}
+                    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                        <DrawerTrigger asChild>
+                            <Button variant="default" className="flex items-center gap-2">
+                                <Plus size={18} />
+                                Create Memo
+                            </Button>
+                        </DrawerTrigger>
+                    </Drawer>
+                </div>
+
+                {/* Memo list */}
+                {memos.length > 0 ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {memos.map((memo) => (
+                            <Card key={memo.id}>
+                                <CardHeader>
+                                    <CardTitle>{memo.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <p className="text-sm text-muted-foreground">{memo.content}</p>
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" onClick={() => handleEdit(memo.id)}>
+                                            Edit
+                                        </Button>
+                                        <Button variant="destructive" onClick={() => handleDelete(memo.id)}>
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-500">No memos yet.</p>
+                )}
+            </div>
+
+            {/* Drawer Content */}
+            <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerContent>
+                    <DrawerHeader>
+                        <DrawerTitle>{editingId ? 'Edit Memo' : 'Create Memo'}</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="p-4 space-y-4">
+                        <div>
+                            <Label htmlFor="title">Title</Label>
+                            <Input
+                                id="title"
+                                value={newTitle}
+                                onChange={(e) => setNewTitle(e.target.value)}
+                                placeholder="Memo title"
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="content">Content</Label>
+                            <Textarea
+                                id="content"
+                                value={newContent}
+                                onChange={(e) => setNewContent(e.target.value)}
+                                placeholder="Memo content"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={editingId ? handleUpdate : handleCreate} className="flex-1">
+                                {editingId ? 'Update' : 'Create'}
+                            </Button>
+                            <DrawerClose asChild>
+                                <Button variant="outline" className="flex-1" onClick={resetForm}>
+                                    Cancel
+                                </Button>
+                            </DrawerClose>
+                        </div>
+                    </div>
+                </DrawerContent>
+            </Drawer>
+        </div>
+    );
+}

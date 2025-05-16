@@ -1,5 +1,5 @@
 import RegisterPage from "@/features/register/RegisterPage";
-export default function Home() {
+export default function Register() {
     return (
         <div>
             <RegisterPage />

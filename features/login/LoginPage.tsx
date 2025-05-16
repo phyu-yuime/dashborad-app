@@ -8,13 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, MailOpen, User } from 'lucide-react';
-
-// Define FormData type
-type FormData = {
-    email: string;
-    password: string;
-};
+import { Loader2, User } from 'lucide-react';
+import { FormData } from '@/types/types';
 
 const LoginPage = () => {
     const router = useRouter();
