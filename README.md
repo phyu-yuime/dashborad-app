@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📝 メモ管理ダッシュボード
 
-## Getting Started
+このプロジェクトは、**Next.js（React）** を使ったフロントエンドと、**Django REST Framework** を使ったバックエンドで構成された、ユーザーごとのメモ管理アプリケーションです。ユーザー登録・ログイン後、メモの作成・編集・削除が可能です。
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 主な機能
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- ユーザー登録・ログイン（セッション認証 + CSRF保護）
+- メモの作成・一覧表示・編集・削除（CRUD）
+- Tailwind CSS + shadcn/ui を使ったダッシュボードUI
+- 認証付きAPI通信（`credentials: include`）
+- レスポンシブで使いやすいインターフェース
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 使用技術
 
-## Learn More
+| レイヤー     | 使用技術                         |
+|--------------|----------------------------------|
+| フロントエンド | Next.js, Tailwind CSS, TypeScript, shadcn/ui |
+| バックエンド   | Django, Django REST Framework     |
+| 認証         | セッション認証 + CSRFトークン     |
+| データベース   | SQLite（初期設定）または PostgreSQL/MySQL（オプション） |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚙️ セットアップ手順
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔧 バックエンド（Django）
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. 仮想環境を作成 & 有効化:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows の場合: venv\Scripts\activate
