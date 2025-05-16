@@ -39,6 +39,7 @@ export default function DashboardPage() {
                 if (response.ok) {
                     const userData = await response.json();
                     setUser(userData);
+                    fetchMemos();
                 } else {
                     console.error('Authentication failed');
                 }
