@@ -23,7 +23,7 @@ export default function App({ Component, pageProps }: AppProps) {
     const [date, setDate] = useState<Date>(new Date());
     useEffect(() => {
         axios
-            .get("http://localhost:8000/api/auth/", {
+            .get(`${process.env.NEXT_PUBLIC_API_URL}/auth/`, {
                 withCredentials: true,
             })
             .then((response) => {
