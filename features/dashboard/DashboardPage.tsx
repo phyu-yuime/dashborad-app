@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { LogOut } from 'lucide-react';
 import {
     Drawer,
     DrawerClose,
@@ -197,6 +198,24 @@ export default function DashboardPage() {
         }
     };
 
+    //logout function 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout/`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                setUser(null);
+                window.location.href = '/login';
+            } else {
+                alert('ログアウトに失敗しました');
+            }
+        } catch (error) {
+            alert('ログアウト時にエラーが発生しました');
+        }
+    };
+
     const resetForm = () => {
         setNewTitle('');
         setNewContent('');
@@ -208,8 +227,19 @@ export default function DashboardPage() {
         <div className="flex min-h-screen">
             {/* Sidebar */}
             <div className="w-64 border-r p-4 hidden md:block">
-                <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-
+                <div className="flex all-center justify-between mb-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
+                        <Button
+                            variant="ghost"
+                            className="flex items-center gap-2 text-red-600"
+                            onClick={handleLogout}
+                        >
+                            <LogOut size={18} />
+                            ログアウト
+                        </Button>
+                    </div>
+                </div>
                 {/* User info section */}
                 <div className="mb-6 py-2 border-b">
                     <div className="flex items-center gap-2 mb-2">
@@ -231,6 +261,7 @@ export default function DashboardPage() {
                             メーモを作成
                         </Button>
                     </DrawerTrigger>
+
                 </Drawer>
             </div>
 
