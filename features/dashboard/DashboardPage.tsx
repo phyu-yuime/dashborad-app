@@ -137,11 +137,16 @@ export default function DashboardPage() {
         if (!editingId) return;
 
         try {
+            const csrfToken = getCookie('csrftoken');
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/${editingId}/`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers,
                 credentials: 'include',
                 body: JSON.stringify({
                     title: newTitle,
@@ -167,9 +172,17 @@ export default function DashboardPage() {
 
     const handleDelete = async (id: number) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/${id}/`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/memos/${id}/delete/`, {
                 method: 'DELETE',
-                credentials: 'include', // Important for sending cookies/authentication
+                headers: (() => {
+                    const csrfToken = getCookie('csrftoken');
+                    const headers: Record<string, string> = {};
+                    if (csrfToken) {
+                        headers['X-CSRFToken'] = csrfToken;
+                    }
+                    return headers;
+                })(),
+                credentials: 'include',
             });
 
             if (response.ok) {
