@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { LogOut } from 'lucide-react';
+import themeConfig from "@/themes.config";
+
 import {
     Drawer,
     DrawerClose,
@@ -234,20 +236,17 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen" bg-secondary>
             {/* Sidebar */}
-            <div className="w-64 border-r p-4 hidden md:block">
-                <div className="flex all-center justify-between mb-6">
+            <div className="w-[20rem] border-r p-4 hidden md:block">
+                <div className="flex all-center justify-between">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-                        <Button
-                            variant="ghost"
-                            className="flex items-center gap-2 text-red-600"
-                            onClick={handleLogout}
-                        >
-                            <LogOut size={18} />
-                            ログアウト
-                        </Button>
+                        <h2 className="text-xl font-semibold mb-4" style={{
+                            color: themeConfig.colors.primary,
+                            fontFamily: themeConfig.fontFamily.body.join(","),
+                            fontSize: themeConfig.fontSize.fontTitle,
+                        }}>Dashboard</h2>
+
                     </div>
                 </div>
                 {/* User info section */}
@@ -266,17 +265,39 @@ export default function DashboardPage() {
 
                 <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                     <DrawerTrigger asChild>
-                        <Button variant="default" className="w-full flex items-center gap-2">
+                        <Button className="w-full flex items-center gap-2 bg-red">
                             <Plus size={18} />
                             メーモを作成
                         </Button>
                     </DrawerTrigger>
 
+                    <Button
+                        variant="outline"
+                        className=" my-[1.5rem] w-[18rem]"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={18} />
+                        ログアウト
+                    </Button>
+
                 </Drawer>
             </div>
 
+
+
             {/* Main content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 py-2 px-2">
+                <div className="md:hidden flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold">Dashboard</h2>
+                    <Button
+                        variant="ghost"
+                        className="flex items-center gap-2 text-red-600"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={18} />
+                        ログアウト
+                    </Button>
+                </div>
                 <div className="mb-4">
                     {/* User info for mobile view */}
                     <div className="md:hidden flex items-center justify-between mb-4">
