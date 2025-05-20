@@ -287,7 +287,7 @@ export default function DashboardPage() {
 
             {/* Main content */}
             <div className="flex-1 py-2 px-2">
-                <div className="md:hidden flex items-center justify-between mb-4">
+                <div className="md:hidden flex items-center justify-between mb-4 bg-gray">
                     <h2 className="text-xl font-semibold">Dashboard</h2>
                     <Button
                         variant="ghost"
