@@ -236,22 +236,23 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="flex min-h-screen" bg-secondary>
+        <div className="flex min-h-screen ">
             {/* Sidebar */}
-            <div className="w-[20rem] border-r p-4 hidden md:block">
+            <div className="w-[20rem] border-r   hidden md:block" style={{ backgroundColor: themeConfig.colors.secondary }}>
                 <div className="flex all-center justify-between">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between py-4 px-4">
                         <h2 className="text-xl font-semibold mb-4" style={{
-                            color: themeConfig.colors.primary,
+                            color: themeConfig.colors.white,
                             fontFamily: themeConfig.fontFamily.body.join(","),
                             fontSize: themeConfig.fontSize.fontTitle,
+                            marginRight: "1rem",
                         }}>Dashboard</h2>
 
                     </div>
                 </div>
                 {/* User info section */}
                 <div className="mb-6 py-2 border-b">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2 text-white">
                         <User size={18} />
                         {loading ? (
                             <span className="text-sm text-muted-foreground">Loading...</span>
@@ -265,7 +266,7 @@ export default function DashboardPage() {
 
                 <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                     <DrawerTrigger asChild>
-                        <Button className="w-full flex items-center gap-2 bg-red">
+                        <Button variant="ghost" className="w-full flex items-center gap-2 bg-white">
                             <Plus size={18} />
                             メーモを作成
                         </Button>
@@ -286,8 +287,8 @@ export default function DashboardPage() {
 
 
             {/* Main content */}
-            <div className="flex-1 py-2 px-2">
-                <div className="md:hidden flex items-center justify-between mb-4 bg-gray">
+            <div className="flex-1">
+                <div className="md:hidden flex items-center justify-between mb-4 bg-gray" style={{ backgroundColor: themeConfig.colors.secondaryLight }}>
                     <h2 className="text-xl font-semibold">Dashboard</h2>
                     <Button
                         variant="ghost"

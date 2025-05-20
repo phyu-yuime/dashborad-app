@@ -1,8 +1,8 @@
 const themeConfig = {
     colors: {
         primary: "#a30000",
-        //primary: "#283747",
-        secondary: "#EAEDED",
+        primaryLight: "#283747",
+        secondary: "#0e1217",
         secondaryDark: "#283747 ",
         secondaryLight: "#85929E",
         white: "#ffffff",
