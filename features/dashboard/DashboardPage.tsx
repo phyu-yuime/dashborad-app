@@ -28,31 +28,33 @@ export default function DashboardPage() {
     const [user, setUser] = useState<{ username: string } | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch user info when component mounts
     useEffect(() => {
-        const fetchUserInfo = async () => {
+        const fetchCurrentUser = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/userinfo/`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-
                 if (response.ok) {
-                    const userData = await response.json();
-                    setUser(userData);
+                    const data = await response.json();
+                    setUser(data); // ← ここで username をセット
                     fetchMemos();
                 } else {
-                    console.error('Authentication failed');
+                    setUser(null);
+                    console.error('Failed to fetch user:', await response.text());
                 }
             } catch (error) {
-                console.error('Error fetching user info:', error);
+                setUser(null);
+                console.error('Error fetching user:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserInfo();
+        fetchCurrentUser();
     }, []);
+
+
 
     const fetchMemos = async () => {
         try {
@@ -201,13 +203,21 @@ export default function DashboardPage() {
     //logout function 
     const handleLogout = async () => {
         try {
+            const csrfToken = getCookie('csrftoken');
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout/`, {
                 method: 'POST',
                 credentials: 'include',
+                headers,
             });
             if (response.ok) {
                 setUser(null);
-                window.location.href = '/login';
+                window.location.href = '/';
             } else {
                 alert('ログアウトに失敗しました');
             }
@@ -323,11 +333,11 @@ export default function DashboardPage() {
 
             {/* Drawer Content */}
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <DrawerContent>
+                <DrawerContent className="shadow-none">
                     <DrawerHeader>
                         <DrawerTitle>{editingId ? '改修メーモ' : 'メーモ'}</DrawerTitle>
                     </DrawerHeader>
-                    <div className="p-4 space-y-4">
+                    <div className="p-4 space-y-4 overflow-y-auto max-h-[70vh]">
                         <div>
                             <Label htmlFor="title" className='mb-[0.75rem]'>タイトル</Label>
                             <Input

@@ -39,9 +39,9 @@ const LoginPage = () => {
 
         try {
             // 1. CSRFトークンをCookieにセット
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/csrf/`, {
-                credentials: 'include',
-            });
+            // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/csrf/`, {
+            //     credentials: 'include',
+            // });
 
             // 2. Cookieから取得
             const csrfToken = getCookie('csrftoken');
