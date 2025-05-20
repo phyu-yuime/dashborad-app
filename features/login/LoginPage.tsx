@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -11,37 +11,21 @@ import { Label } from '@/components/ui/label';
 import { Loader2, User } from 'lucide-react';
 import { FormData } from '@/types/types';
 
+
+// Cookieから値を取得する関数
+function getCookie(name: string) {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+}
+
 const LoginPage = () => {
     const router = useRouter();
     const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [csrfToken, setCsrfToken] = useState<string>('');
-
-    // Fetch CSRF token on mount
-    useEffect(() => {
-        const fetchCsrfToken = async () => {
-            try {
-
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.csrf_token) {
-                        setCsrfToken(data.csrf_token);
-                        console.log('CSRF token obtained');
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to fetch CSRF token:', error);
-            }
-        };
-
-        fetchCsrfToken();
-    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -54,11 +38,18 @@ const LoginPage = () => {
         setError('');
 
         try {
+            // 1. CSRFトークンをCookieにセット
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/csrf/`, {
+                credentials: 'include',
+            });
+
+            // 2. Cookieから取得
+            const csrfToken = getCookie('csrftoken');
+
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             };
-
             if (csrfToken) {
                 headers['X-CSRFToken'] = csrfToken;
             }
@@ -72,7 +63,6 @@ const LoginPage = () => {
 
             const responseText = await response.text();
             let data;
-
             try {
                 data = JSON.parse(responseText);
             } catch (e) {
@@ -152,9 +142,6 @@ const LoginPage = () => {
                             </Link>
                         </div>
                     </div>
-
-
-
                 </CardContent>
             </Card>
         </div>

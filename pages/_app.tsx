@@ -37,18 +37,6 @@ export default function App({ Component, pageProps }: AppProps) {
     return (
         <div className="App">
             <Component {...pageProps} />
-            {process.env.NODE_ENV === "development" && showDeveloperTools && (
-                <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-3 rounded-lg shadow-lg z-50">
-                    <p className="mb-2 text-sm font-medium">Developer Tools Active</p>
-                    <button
-                        onClick={handleHideDevTools}
-                        className="flex items-center gap-2 text-sm hover:opacity-80"
-                    >
-                        <EyeOff size={16} />
-                        Hide Dev Tools for This Session
-                    </button>
-                </div>
-            )}
         </div>
     );
 }
