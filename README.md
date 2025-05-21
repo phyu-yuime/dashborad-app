@@ -34,7 +34,7 @@
    python -m venv venv
    source venv/bin/activate  # Windows の場合: venv\Scripts\activate
 
-### 
+### git gh-pages 作成
 ```
 git checkout main
 git checkout -b gh-pages
