@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User, LogIn } from 'lucide-react';
 import { FormData } from '@/types/types';
+import useSWRMutation from 'swr/mutation';
 
-
-// Cookieから値を取得する関数
+// Get cookie function
 function getCookie(name: string) {
     if (typeof document === 'undefined') return null;
     const value = `; ${document.cookie}`;
@@ -21,11 +21,67 @@ function getCookie(name: string) {
     return null;
 }
 
+// Login fetcher function for SWR
+async function loginUser(url: string, { arg }: { arg: FormData }) {
+    // Get CSRF token from cookie
+    const csrfToken = getCookie('csrftoken');
+
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    };
+
+    if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(arg),
+    });
+
+    const responseText = await response.text();
+    let data;
+
+    try {
+        data = JSON.parse(responseText);
+    } catch (e) {
+        throw new Error('Invalid server response');
+    }
+
+    if (!response.ok) {
+        throw new Error(data.error || `Login failed (${response.status})`);
+    }
+
+    return data;
+}
+
 const LoginPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
-    const [error, setError] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
+
+    // Use SWR mutation for login
+    const { trigger, error, isMutating, data } = useSWRMutation('/auth/login/', loginUser);
+
+    // Check for registration success message
+    useEffect(() => {
+        const registered = searchParams?.get('registered');
+        if (registered === 'true') {
+            setRegistrationSuccess(true);
+        }
+    }, [searchParams]);
+
+    // Handle successful login
+    useEffect(() => {
+        if (data && data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            router.push('/dashboard');
+        }
+    }, [data, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -34,72 +90,39 @@ const LoginPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        setError('');
-
         try {
-            // 1. CSRFトークンをCookieにセット
-            // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/csrf/`, {
-            //     credentials: 'include',
-            // });
-
-            // 2. Cookieから取得
-            const csrfToken = getCookie('csrftoken');
-
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            };
-            if (csrfToken) {
-                headers['X-CSRFToken'] = csrfToken;
-            }
-
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login/`, {
-                method: 'POST',
-                headers,
-                credentials: 'include',
-                body: JSON.stringify(formData),
-            });
-
-            const responseText = await response.text();
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (e) {
-                console.error('Invalid server response');
-                data = { error: 'Invalid server response' };
-            }
-
-            if (!response.ok) {
-                throw new Error(data.error || `Login failed (${response.status})`);
-            }
-
-            localStorage.setItem('user', JSON.stringify(data.user));
-            router.push('/dashboard');
+            await trigger(formData);
         } catch (err) {
             console.error('Login error:', err);
-            setError(err instanceof Error ? err.message : 'Login failed');
-        } finally {
-            setIsLoading(false);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-            <Card className="w-full max-w-md p-6">
+        <div className="flex items-center justify-center min-h-screen bg-muted px-4">
+            <Card className="w-full max-w-md shadow-xl">
+                <CardHeader>
+                    <CardTitle className="text-center text-2xl font-bold">ログイン</CardTitle>
+                </CardHeader>
                 <CardContent>
-                    <h1 className="text-2xl font-semibold text-center mb-4 text-black-500 ">ログイン</h1>
+                    {registrationSuccess && (
+                        <Alert className="mb-4 bg-green-50 border-green-300">
+                            <AlertTitle className="text-green-700">登録完了</AlertTitle>
+                            <AlertDescription className="text-green-600">
+                                登録が完了しました。ログインしてください。
+                            </AlertDescription>
+                        </Alert>
+                    )}
 
                     {error && (
                         <Alert variant="destructive" className="mb-4">
                             <AlertTitle>エラー</AlertTitle>
-                            <AlertDescription>{error}</AlertDescription>
+                            <AlertDescription>{error.message}</AlertDescription>
                         </Alert>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <Label htmlFor="email" className='mb-[0.75rem]'>メールアドレス</Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">メールアドレス</Label>
                             <Input
                                 id="email"
                                 name="email"
@@ -107,11 +130,13 @@ const LoginPage = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                className="bg-white"
+                                placeholder="example@email.com"
                             />
                         </div>
 
-                        <div>
-                            <Label htmlFor="password" className='mb-[0.75rem]'>パスワード</Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="password">パスワード</Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -119,26 +144,46 @@ const LoginPage = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
+                                className="bg-white"
+                                placeholder="••••••••"
                             />
                         </div>
 
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : 'ログイン'}
+                        <Button
+                            type="submit"
+                            className="w-full flex items-center justify-center gap-2"
+                            disabled={isMutating}
+                        >
+                            {isMutating ? (
+                                <Loader2 className="animate-spin h-4 w-4" />
+                            ) : (
+                                <>
+                                    <LogIn className="h-4 w-4" />
+                                    ログイン
+                                </>
+                            )}
                         </Button>
                     </form>
 
-                    <div className="mt-6 text-center space-y-2">
-                        <Link href="/forgot-password">
-                            <Button variant="link" className="text-sm text-red-600 p-0 cursor-pointer">
+                    <div className="mt-6 text-center space-y-4">
+                        <Link href="/forgot-password" className="block">
+                            <Button variant="link" className="text-sm text-primary p-0 cursor-pointer">
                                 パスワードをお忘れですか？
                             </Button>
                         </Link>
-                        <div className="flex items-center justify-center mt-4 space-x-2">
-                            <p className="text-sm ">
+
+                        <div className="pt-2 border-t">
+                            <p className="text-sm mb-2">
                                 アカウントをお持ちでないですか？
                             </p>
-                            <Link href="/register">
-                                <Button variant="outline" className="p-0 text-blue-600 bg-gray-100 cursor-pointer"> <User />新規登録</Button>
+                            <Link href="/register" className="block">
+                                <Button
+                                    variant="outline"
+                                    className="w-full flex items-center justify-center gap-2"
+                                >
+                                    <User className="h-4 w-4" />
+                                    新規登録
+                                </Button>
                             </Link>
                         </div>
                     </div>
