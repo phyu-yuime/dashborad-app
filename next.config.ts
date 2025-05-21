@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  output: 'export',
+  turbopack: {},  
   webpack: (config) => {
     config.resolve.alias['@components'] = path.join(__dirname, 'components');
     config.resolve.alias['@styles'] = path.join(__dirname, 'styles');
@@ -9,4 +11,4 @@ const nextConfig: NextConfig = {
   }
 };
 
-export default nextConfig;
+module.exports = nextConfig;
