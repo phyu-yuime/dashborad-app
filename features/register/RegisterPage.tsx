@@ -8,6 +8,30 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
+import useSWRMutation from 'swr/mutation';
+
+// Create a fetcher function for SWR mutation
+type RegisterFormData = {
+    username: string;
+    email: string;
+    password: string;
+    password2: string;
+};
+
+async function registerUser(url: string, { arg }: { arg: RegisterFormData }) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(arg),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || Object.values(errorData)[0] || 'Registration failed');
+    }
+
+    return response.json();
+}
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -17,8 +41,9 @@ export default function RegisterPage() {
         password: '',
         password2: '',
     });
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+
+    // Use SWR mutation hook
+    const { trigger, error, isMutating } = useSWRMutation('/auth/register/', registerUser);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -29,26 +54,14 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        setError('');
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || Object.values(errorData)[0] || 'Registration failed');
-            }
-
+            // Trigger the mutation with form data
+            await trigger(formData);
             router.push('/login?registered=true');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Registration failed');
-        } finally {
-            setIsLoading(false);
+            // Error handling is automatically managed by SWR
+            console.error(err);
         }
     };
 
@@ -63,7 +76,7 @@ export default function RegisterPage() {
                         {error && (
                             <Alert variant="destructive">
                                 <AlertTitle>Error</AlertTitle>
-                                <AlertDescription>{error}</AlertDescription>
+                                <AlertDescription>{error.message}</AlertDescription>
                             </Alert>
                         )}
 
@@ -115,14 +128,15 @@ export default function RegisterPage() {
                             />
                         </div>
 
-                        <div className='flex items-center justify-center gap-2 justify-center'>
-                            <Button type="submit" className="" disabled={isLoading}>
-                                {isLoading ? 'Registering...' : 'Register'}
+                        <div className="flex items-center justify-center gap-2">
+                            <Button type="submit" disabled={isMutating}>
+                                {isMutating ? 'Registering...' : 'Register'}
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => router.back()}
                                 className="flex items-center gap-2 self-start text-sm"
+                                type="button"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                                 Back

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { LogOut, Plus, User } from 'lucide-react';
-import themeConfig from "@/themes.config";
 import {
     Drawer,
     DrawerClose,
