@@ -33,3 +33,13 @@
    ```bash
    python -m venv venv
    source venv/bin/activate  # Windows の場合: venv\Scripts\activate
+
+### 
+```
+git checkout main
+git checkout -b gh-pages
+cp -r out/* .
+git add .
+git commit -m "Develop static site"
+git push origin gh-pages
+```
