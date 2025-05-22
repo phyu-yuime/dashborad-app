@@ -1,5 +1,6 @@
 
 import Header from "@/components/header/Header";
+import CustomSlider from "@/components/slider/Slider";
 import LoginPage from "@/features/login/LoginPage";
 
 export default function Home() {
@@ -7,6 +8,9 @@ export default function Home() {
         <>
             <Header />
             {/* <LoginPage /> */}
+            <div className="w-full">
+                <CustomSlider />
+            </div>
         </>
     );
 }
