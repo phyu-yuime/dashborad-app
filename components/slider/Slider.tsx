@@ -87,14 +87,6 @@ export default function CustomSlider() {
                     {currentSlide + 1} / {images.length}
                 </div>
             </div>
-
-            {/* Title and description */}
-            <div className="text-center mt-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Beautiful Image Gallery</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                    Explore our stunning collection of images with smooth transitions and elegant controls.
-                </p>
-            </div>
         </div>
     );
 }
