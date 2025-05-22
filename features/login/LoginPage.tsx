@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, User, LogIn } from 'lucide-react';
 import { FormData } from '@/types/types';
 import useSWRMutation from 'swr/mutation';
+import { useUserStore } from "@/store/userStore";
 
 // Get cookie function
 function getCookie(name: string) {
@@ -78,6 +79,7 @@ const LoginPage = () => {
     // Handle successful login
     useEffect(() => {
         if (data && data.user) {
+            useUserStore.getState().setUser(data.user);
             localStorage.setItem('user', JSON.stringify(data.user));
             router.push('/dashboard');
         }
