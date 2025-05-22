@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/drawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Memo } from '@/types/types';
+import { useUIStore } from "@/store/drawStore"
 
 // SWR fetcher
 const fetcher = (url: string) =>
@@ -47,7 +47,12 @@ export default function DashboardPage() {
     const [newTitle, setNewTitle] = useState('');
     const [newContent, setNewContent] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    // const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+    const isDrawerOpen = useUIStore((state) => state.isDrawerOpen);
+    const setDrawerOpen = useUIStore((state) => state.setDrawerOpen);
+
+
 
     // メモ作成
     const handleCreate = async () => {
@@ -81,7 +86,7 @@ export default function DashboardPage() {
             setNewTitle(memo.title);
             setNewContent(memo.content);
             setEditingId(id);
-            setIsDrawerOpen(true);
+            setDrawerOpen(true);
         }
     };
 
@@ -158,7 +163,7 @@ export default function DashboardPage() {
         setNewTitle('');
         setNewContent('');
         setEditingId(null);
-        setIsDrawerOpen(false);
+        setDrawerOpen(false);
     };
 
     return (
@@ -189,7 +194,7 @@ export default function DashboardPage() {
 
                     {/* Actions */}
                     <div className="space-y-4">
-                        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                        <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                             <DrawerTrigger asChild>
                                 <Button className="w-full bg-white text-blue-600 hover:bg-gray-100 flex items-center justify-center gap-2 rounded-lg font-medium transition-all">
                                     <Plus size={18} />
@@ -216,7 +221,7 @@ export default function DashboardPage() {
                 <div className="md:hidden flex items-center justify-between mb-6 bg-blue-600 text-white p-4 rounded-lg">
                     <h2 className="text-xl font-bold">Dashboard</h2>
                     <div className="flex gap-2">
-                        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                        <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                             <DrawerTrigger asChild>
                                 <Button size="sm" variant="ghost" className="text-white hover:bg-blue-700">
                                     <Plus size={20} />
@@ -290,7 +295,7 @@ export default function DashboardPage() {
                     <Card className="border border-dashed border-gray-300 bg-gray-50">
                         <CardContent className="flex flex-col items-center justify-center py-12">
                             <h3 className="text-lg font-medium text-gray-800 mb-4">No memos found.</h3>
-                            <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                            <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                                 <DrawerTrigger asChild>
                                     <Button className="bg-blue-600 hover:bg-blue-700">
                                         <Plus size={18} className="mr-2" />
@@ -303,7 +308,7 @@ export default function DashboardPage() {
                 )}
             </div>
             {/* Drawer Content */}
-            <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                 <DrawerContent className="shadow-lg">
                     <DrawerHeader className="border-b pb-4">
                         <DrawerTitle className="text-xl font-bold text-center">
