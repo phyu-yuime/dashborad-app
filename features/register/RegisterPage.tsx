@@ -9,14 +9,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import useSWRMutation from 'swr/mutation';
-
-// Create a fetcher function for SWR mutation
-type RegisterFormData = {
-    username: string;
-    email: string;
-    password: string;
-    password2: string;
-};
+import { RegisterFormData } from '@/types/types';
+import { useUserStore } from '@/store/userStore';
 
 async function registerUser(url: string, { arg }: { arg: RegisterFormData }) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
@@ -44,6 +38,7 @@ export default function RegisterPage() {
 
     // Use SWR mutation hook
     const { trigger, error, isMutating } = useSWRMutation('/auth/register/', registerUser);
+    const setUser = useUserStore((state) => state.setUser);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -57,8 +52,9 @@ export default function RegisterPage() {
 
         try {
             // Trigger the mutation with form data
-            await trigger(formData);
-            router.push('/login?registered=true');
+            const user = await trigger(formData);
+            setUser(user);
+            router.push('/');
         } catch (err) {
             // Error handling is automatically managed by SWR
             console.error(err);
