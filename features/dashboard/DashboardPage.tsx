@@ -196,7 +196,7 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                         <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                             <DrawerTrigger asChild>
-                                <Button className="w-full bg-white text-blue-600 hover:bg-gray-100 flex items-center justify-center gap-2 rounded-lg font-medium transition-all">
+                                <Button className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2 rounded-lg font-medium transition-all w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2 rounded-lg font-medium transition-all">
                                     <Plus size={18} />
                                     メーモを作成
                                 </Button>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
 
                         <Button
                             variant="ghost"
-                            className="w-full justify-start text-white hover:bg-blue-700 hover:text-white flex items-center gap-2"
+                            className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2 rounded-lg font-medium transition-all"
                             onClick={handleLogout}
                         >
                             <LogOut size={18} />
@@ -223,12 +223,12 @@ export default function DashboardPage() {
                     <div className="flex gap-2">
                         <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
                             <DrawerTrigger asChild>
-                                <Button size="sm" variant="ghost" className="text-white hover:bg-blue-700">
+                                <Button size="sm" variant="ghost" className="text-white bg-white-600">
                                     <Plus size={20} />
                                 </Button>
                             </DrawerTrigger>
                         </Drawer>
-                        <Button size="sm" variant="ghost" className="text-white hover:bg-blue-700" onClick={handleLogout}>
+                        <Button size="sm" variant="ghost" className="text-white bg-white-700" onClick={handleLogout}>
                             <LogOut size={20} />
                         </Button>
                     </div>

@@ -22,3 +22,4 @@ export interface RegisterFormData {
     password: string;
     password2:string;
 }
+
