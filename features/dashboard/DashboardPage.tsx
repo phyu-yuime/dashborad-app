@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/drawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useUIStore } from "@/store/drawStore"
+import { useUIStore } from "@/store/useDrawStore"
 
 // SWR fetcher
 const fetcher = (url: string) =>
